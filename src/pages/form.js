@@ -1,14 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import client from '../axios/client.js';
 import { Link } from 'react-router-dom';
 import AlertDialog from '../components/dialog.js';
-import Button from '@mui/material/Button';
 import SendIcon from '@mui/icons-material/Send';
+import Fab from '@mui/material/Fab';
+import { Typography } from '@mui/material';
 
 const FileUploadComponent = () => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [open, setOpen] = React.useState(false);
   const [msg, setMsg] = React.useState(null);
+  const fileInputRef = useRef(null);
 
   const handleFileChange = (event) => {
     const file = event.target.files[0];
@@ -30,10 +32,12 @@ const FileUploadComponent = () => {
         console.log("Página HTML selecionada:", selectedFile);
         uploadFile(formData);
       } else {
-
         setMsg("Por favor, selecione um arquivo .html válido!");
         handleClickOpen();
       }
+
+      setSelectedFile(null);
+      fileInputRef.current.value = null;
     } else {
       setMsg("Por favor, selecione um arquivo!");
       handleClickOpen();
@@ -62,26 +66,31 @@ const FileUploadComponent = () => {
 
   return (
     <div>
-      <h2 className='title'>Contador de tags HTML</h2>
-      <p className='description'>Selecione um arquivo .html e faça o upload para fazer a contagem de tags.</p>
-      <form>
-        <input type="file" id="myFile" name="filename" onChange={handleFileChange} />
+      <Typography align='center' variant='h5'>Contador de tags HTML</Typography>
+      <Typography align='center' variant='h6'>Selecione um arquivo .html e faça o upload para fazer a contagem de tags.</Typography>
+      <br />
+      <form align='center'>
+        <Fab variant="extended" size="medium" color="primary" aria-label="add" htmlFor="contained-button-file">
+          <input ref={fileInputRef} styles={{ display: "none" }} type="file" id="contained-button-file" name="filename" onChange={handleFileChange} />
+        </Fab>
         <br />
         <br />
-        <Button onClick={handleSubmit} variant="contained" endIcon={<SendIcon />}>
+        <Fab onClick={handleSubmit} variant="extended" size="medium" color="primary" aria-label="add">
           Enviar
-        </Button>
+          <SendIcon sx={{ marginLeft: 1 }} />
+        </Fab>
+        <br />
+        <br />
+        <br />
+        <Typography align='center' variant='h6'>Acesse a contagem das tags das páginas salvas</Typography>
+        <br />
+        <Link to="/saved-pages">
+          <Fab variant="extended" size="medium" color="primary" aria-label="add">
+            Acessar
+          </Fab>
+        </Link>
+        <AlertDialog open={open} setOpen={setOpen} msg={msg} />
       </form>
-      <br />
-      <br />
-      <br />
-      <p className='description'>Acesse a contagem das tags das páginas salvas</p>
-      <Link to="/saved-pages">
-        <Button variant="contained" size="medium">
-          Acessar
-        </Button>
-      </Link>
-      <AlertDialog open={open} setOpen={setOpen} msg={msg} />
     </div>
   );
 };

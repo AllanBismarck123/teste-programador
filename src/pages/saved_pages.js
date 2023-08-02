@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import client from '../axios/client.js';
+import CircularProgress from '@mui/material/CircularProgress';
 
 var SavedPages = () => {
     const [loading, setLoading] = useState(true);
@@ -22,10 +23,10 @@ var SavedPages = () => {
     return (
         <div>
             {loading ? (
-                <p>Carregando...</p>
+                <CircularProgress />
             ) : (
                 <div>
-                    <h2>Dados da API:</h2>
+                    <h2 className='title'>Dados da API:</h2>
                     <pre>{JSON.stringify(apiData, null, 2)}</pre>
                 </div>
             )}

@@ -1,9 +1,9 @@
 import axios from "axios";
 
-const baseURL = 'localhost:4000';
+const baseURL = 'https://backendtesteprogramador.onrender.com';
 
 const client = axios.create({
-  baseURL: "http://" + baseURL
+  baseURL: baseURL
 })
 
 export default client;

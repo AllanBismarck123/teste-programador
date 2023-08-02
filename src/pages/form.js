@@ -1,9 +1,14 @@
 import React, { useState } from 'react';
 import client from '../axios/client.js';
 import { Link } from 'react-router-dom';
+import AlertDialog from '../components/dialog.js';
+import Button from '@mui/material/Button';
+import SendIcon from '@mui/icons-material/Send';
 
 const FileUploadComponent = () => {
   const [selectedFile, setSelectedFile] = useState(null);
+  const [open, setOpen] = React.useState(false);
+  const [msg, setMsg] = React.useState(null);
 
   const handleFileChange = (event) => {
     const file = event.target.files[0];
@@ -13,43 +18,70 @@ const FileUploadComponent = () => {
   const handleSubmit = async (event) => {
     event.preventDefault();
 
-    const type = selectedFile.type.split('/')[1];
+    if (selectedFile) {
 
-    let formData = new FormData();
+      const type = selectedFile.type.split('/')[1];
 
-    formData.append("archive_html", selectedFile);
+      let formData = new FormData();
 
-    if (type === "html") {
-      console.log("Página HTML selecionada:", selectedFile);
-      uploadFile(formData);
+      formData.append("archive_html", selectedFile);
+
+      if (type === "html") {
+        console.log("Página HTML selecionada:", selectedFile);
+        uploadFile(formData);
+      } else {
+
+        setMsg("Por favor, selecione um arquivo .html válido!");
+        handleClickOpen();
+      }
     } else {
-      alert("Por favor, selecione um arquivo .html válido!");
+      setMsg("Por favor, selecione um arquivo!");
+      handleClickOpen();
     }
+  };
+
+  const handleClickOpen = () => {
+    setOpen(true);
   };
 
   function uploadFile(file) {
     client.post('/upload-html', file)
       .then(function (response) {
-        alert('Página contabilizada e salva com sucesso!\n' +
-        'Para acessar a contagem das tags, acesse as páginas\n' +
-        'salvas através do botão abaixo.');
+        setMsg('Página contabilizada e salva com sucesso!\n' +
+          'Para acessar a contagem das tags, acesse as páginas\n' +
+          'salvas através do botão abaixo.');
         console.log(response.data.data.tags);
+        handleClickOpen();
       })
       .catch(function (error) {
-        alert('Erro, Verifique sua conexão');
+        setMsg('Erro, Verifique sua conexão');
         console.error(error);
+        handleClickOpen();
       });
   }
 
   return (
     <div>
-      <p>Selecione um arquivo .html e faça o upload para fazer a contagem de tags.</p>
-      <form onSubmit={handleSubmit}>
+      <h2 className='title'>Contador de tags HTML</h2>
+      <p className='description'>Selecione um arquivo .html e faça o upload para fazer a contagem de tags.</p>
+      <form>
         <input type="file" id="myFile" name="filename" onChange={handleFileChange} />
-        <input type="submit" value="Upload" />
+        <br />
+        <br />
+        <Button onClick={handleSubmit} variant="contained" endIcon={<SendIcon />}>
+          Enviar
+        </Button>
       </form>
-      <p>Acesse a contagem das tags das páginas salvas</p>
-      <button><Link to="/saved-pages">Acessar</Link></button>
+      <br />
+      <br />
+      <br />
+      <p className='description'>Acesse a contagem das tags das páginas salvas</p>
+      <Link to="/saved-pages">
+        <Button variant="contained" size="medium">
+          Acessar
+        </Button>
+      </Link>
+      <AlertDialog open={open} setOpen={setOpen} msg={msg} />
     </div>
   );
 };

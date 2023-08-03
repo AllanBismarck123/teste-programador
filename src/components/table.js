@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { styled, alpha } from '@mui/material/styles';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -9,7 +9,10 @@ import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import { IconButton } from '@mui/material';
-import { ArrowDropUp } from '@mui/icons-material';
+import { ArrowDropUp, Delete } from '@mui/icons-material';
+import DeleteDialog from './deleteDialog';
+import AlertDialog from './dialog';
+import client from '../axios/client.js';
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
     [`&.${tableCellClasses.head}`]: {
@@ -33,10 +36,38 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
 
 export default function CustomizedTables(props) {
     const [showComponent, setShowComponent] = useState(false);
+    const [open, setOpen] = useState(false);
+    const [openAlert, setOpenAlert] = useState(false);
+    const [dialogResult, setDialogResult] = useState(false);
+
+    const msg = "Tem certeza que deseja excluir essa página?";
+
+    var msgAlert;
+
+    const deletePage = (id) => {
+        client.delete(`/documento/${id}`)
+        .then((res) => {
+            if(res.status === 200) {
+                msgAlert = "Documento deletado com sucesso.";
+                setOpenAlert(true);
+            } else {
+                msgAlert = "Documento não encontrado.";
+                setOpenAlert(true);
+            }
+        })
+        .catch((error) => {
+            msgAlert = `Erro na requisição, ${error}`;
+            setOpenAlert(true);
+        })
+    }
 
     const toggleComponent = () => {
         setShowComponent((prevShowComponent) => !prevShowComponent);
     };
+
+    const handleClickOpen = () => {
+        setOpen(true);
+      };
 
     function getIconShow() {
         return showComponent ?
@@ -44,13 +75,21 @@ export default function CustomizedTables(props) {
             <ArrowDropUp style={{ color: "white" }} fontSize='medium' />;
     }
 
+    useEffect(() => {
+        if (dialogResult) {
+          deletePage(props.page._id);
+          window.location.reload();
+        }
+      }, [dialogResult]);
+
     return (
         <TableContainer align='center' component={Paper} sx={{ maxWidth: 500 }}>
             <Table sx={{ minWidth: 200 }} aria-label="customized table">
                 <TableHead>
                     <TableRow>
-                        <StyledTableCell>Página {props.index}</StyledTableCell>
-                        <StyledTableCell align="right"><IconButton onClick={toggleComponent} size='medium' >
+                        {props.index === 0 ? <StyledTableCell>Última página salva</StyledTableCell> : <StyledTableCell>Página {props.index}</StyledTableCell>}
+                        <StyledTableCell align="right"><IconButton onClick={handleClickOpen} size='small' >
+                            <Delete style={{ color: '#693BB6'}}/></IconButton><IconButton onClick={toggleComponent} size='small' >
                             {getIconShow()}</IconButton></StyledTableCell>
                     </TableRow>
                     {showComponent &&
@@ -62,7 +101,7 @@ export default function CustomizedTables(props) {
                 </TableHead>
                 {showComponent &&
                     <TableBody>
-                        {props.tags.tags.map((row) => (
+                        {props.page.tags.map((row) => (
                             <StyledTableRow key={row.name}>
                                 <StyledTableCell component="th" scope="row">
                                     {row.name}
@@ -73,6 +112,8 @@ export default function CustomizedTables(props) {
                     </TableBody>
                 }
             </Table>
+            <DeleteDialog open={open} setOpen={setOpen} msg={msg} setDialogResult={setDialogResult}/>
+            <AlertDialog open={openAlert} setOpen={setOpenAlert} msg={msgAlert} />
         </TableContainer>
     );
 }

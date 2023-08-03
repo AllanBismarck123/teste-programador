@@ -36,14 +36,19 @@ var SavedPages = () => {
                     {apiData.data.length !== 0 && <Typography align='center' variant='h4'>Páginas salvas</Typography>}
                     {error && <Typography color='error' align='center'>{error}</Typography>}
                     <br />
-                    {apiData.data.length === 0 ? 
-                    <Typography align='center' variant='h5'>Não há páginas salvas, use o contador de tags pelo menos uma vez para poder consultar suas páginas salvas</Typography> :
-                    apiData?.data?.map((page, index) => {
-                        return <div key={index} align='center'>
-                            <CustomizedTables tags={page} index={index + 1} /> 
-                            <div style={{ marginBottom: '7px'}}></div>  
-                        </div>
-                    })}
+                    {apiData.data.length === 0 ?
+                        <Typography align='center' variant='h5'>Não há páginas salvas, use o contador de tags pelo menos uma vez para poder consultar suas páginas salvas</Typography> : (
+                            <div align='center'>
+                                <CustomizedTables page={apiData.data[apiData.data.length - 1]} index={0} />
+                                <div style={{ marginBottom: '20px' }}></div>
+                                {apiData?.data?.map((page, index) => {
+                                    return <div key={index} >
+                                        <CustomizedTables page={page} index={index + 1} />
+                                        <div style={{ marginBottom: '5px' }}></div>
+                                    </div>
+                                })}
+                            </div>
+                        )}
                 </div>
             )}
         </div>

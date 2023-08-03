@@ -1,8 +1,8 @@
 import React from "react";
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 
-import FileUploadComponent from "./pages/form.js";
-import SavedPages from "./pages/saved_pages.js";
+import FileUploadComponent from "../pages/form.js";
+import SavedPages from "../pages/saved_pages.js";
 
 const MyRoutes = () => {
     return (

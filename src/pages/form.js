@@ -8,8 +8,8 @@ import { Typography } from '@mui/material';
 
 const FileUploadComponent = () => {
   const [selectedFile, setSelectedFile] = useState(null);
-  const [open, setOpen] = React.useState(false);
-  const [msg, setMsg] = React.useState(null);
+  const [open, setOpen] = useState(false);
+  const [msg, setMsg] = useState(null);
   const fileInputRef = useRef(null);
 
   const handleFileChange = (event) => {

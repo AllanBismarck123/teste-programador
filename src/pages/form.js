@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import client from '../axios/client.js';
 import { Link } from 'react-router-dom';
 import AlertDialog from '../components/dialog.js';
@@ -11,6 +11,10 @@ const FileUploadComponent = () => {
   const [open, setOpen] = useState(false);
   const [msg, setMsg] = useState(null);
   const fileInputRef = useRef(null);
+
+  useEffect(() => {
+    document.title = "Contador de tags HTML";
+  }, []);
 
   const handleFileChange = (event) => {
     const file = event.target.files[0];

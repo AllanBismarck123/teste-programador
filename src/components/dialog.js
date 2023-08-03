@@ -10,6 +10,9 @@ export default function AlertDialog(props) {
 
   const handleClose = () => {
     props.setOpen(false);
+    if(props.deleted) {
+      window.location.reload();
+    }
   };
 
   return (

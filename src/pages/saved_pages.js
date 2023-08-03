@@ -3,6 +3,7 @@ import client from '../axios/client.js';
 import CircularProgress from '@mui/material/CircularProgress';
 import CustomizedTables from '../components/table.js';
 import { Typography } from '@mui/material';
+import ErrorIcon from '@mui/icons-material/Error';
 
 var SavedPages = () => {
     const [loading, setLoading] = useState(true);
@@ -10,6 +11,7 @@ var SavedPages = () => {
     const [error, setError] = useState(null);
 
     useEffect(() => {
+        document.title = "Páginas salvas";
         const fetchData = async () => {
             try {
                 const response = await client.get('/all-pages');
@@ -32,18 +34,23 @@ var SavedPages = () => {
                     <CircularProgress size={50} />
                 </div>
             ) : (
-                <div>
+                <div align='center'>
                     {apiData.data.length !== 0 && <Typography align='center' variant='h4'>Páginas salvas</Typography>}
                     {error && <Typography color='error' align='center'>{error}</Typography>}
                     <br />
                     {apiData.data.length === 0 ?
-                        <Typography align='center' variant='h5'>Não há páginas salvas, use o contador de tags pelo menos uma vez para poder consultar suas páginas salvas</Typography> : (
+                        <div style={{ maxWidth: '400px' }}>
+                            <div style={{ marginBottom: '50px'}}></div>
+                            <div style={{ marginBottom: '10px'}}><ErrorIcon style={{ color: 'red'}} fontSize='large'/></div>
+                            <Typography  variant='h5'>Não há páginas salvas, use o contador de tags pelo menos uma vez para poder consultar suas páginas salvas</Typography>
+                        </div>
+                         : (
                             <div align='center'>
-                                <CustomizedTables page={apiData.data[apiData.data.length - 1]} index={0} />
+                                <CustomizedTables page={apiData.data[apiData.data.length - 1]} index={apiData.data.length - 1} lastPage={true} />
                                 <div style={{ marginBottom: '20px' }}></div>
                                 {apiData?.data?.map((page, index) => {
                                     return <div key={index} >
-                                        <CustomizedTables page={page} index={index + 1} />
+                                        <CustomizedTables page={page} index={index + 1} lastPage={false} />
                                         <div style={{ marginBottom: '5px' }}></div>
                                     </div>
                                 })}

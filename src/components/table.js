@@ -38,27 +38,26 @@ export default function CustomizedTables(props) {
     const [showComponent, setShowComponent] = useState(false);
     const [open, setOpen] = useState(false);
     const [openAlert, setOpenAlert] = useState(false);
+    const [msgAlert, setMsgAlert] = useState(null);
     const [dialogResult, setDialogResult] = useState(false);
 
     const msg = "Tem certeza que deseja excluir essa página?";
 
-    var msgAlert;
-
     const deletePage = (id) => {
         client.delete(`/documento/${id}`)
-        .then((res) => {
-            if(res.status === 200) {
-                msgAlert = "Documento deletado com sucesso.";
+            .then((res) => {
+                if (res.status === 200) {
+                    setMsgAlert("Documento deletado com sucesso.");
+                    setOpenAlert(true);
+                } else {
+                    setMsgAlert("Documento não encontrado.");
+                    setOpenAlert(true);
+                }
+            })
+            .catch((error) => {
+                setMsgAlert(`Erro na requisição, ${error}`);
                 setOpenAlert(true);
-            } else {
-                msgAlert = "Documento não encontrado.";
-                setOpenAlert(true);
-            }
-        })
-        .catch((error) => {
-            msgAlert = `Erro na requisição, ${error}`;
-            setOpenAlert(true);
-        })
+            })
     }
 
     const toggleComponent = () => {
@@ -67,7 +66,7 @@ export default function CustomizedTables(props) {
 
     const handleClickOpen = () => {
         setOpen(true);
-      };
+    };
 
     function getIconShow() {
         return showComponent ?
@@ -77,20 +76,20 @@ export default function CustomizedTables(props) {
 
     useEffect(() => {
         if (dialogResult) {
-          deletePage(props.page._id);
-          window.location.reload();
+            console.log(props.page._id);
+            deletePage(props.page._id);
         }
-      }, [dialogResult]);
+    }, [dialogResult]);
 
     return (
         <TableContainer align='center' component={Paper} sx={{ maxWidth: 500 }}>
             <Table sx={{ minWidth: 200 }} aria-label="customized table">
                 <TableHead>
                     <TableRow>
-                        {props.index === 0 ? <StyledTableCell>Última página salva</StyledTableCell> : <StyledTableCell>Página {props.index}</StyledTableCell>}
+                        {props.lastPage ? <StyledTableCell>Última página salva</StyledTableCell> : <StyledTableCell>Página {props.index}</StyledTableCell>}
                         <StyledTableCell align="right"><IconButton onClick={handleClickOpen} size='small' >
-                            <Delete style={{ color: '#693BB6'}}/></IconButton><IconButton onClick={toggleComponent} size='small' >
-                            {getIconShow()}</IconButton></StyledTableCell>
+                            <Delete style={{ color: '#693BB6' }} /></IconButton><IconButton onClick={toggleComponent} size='small' >
+                                {getIconShow()}</IconButton></StyledTableCell>
                     </TableRow>
                     {showComponent &&
                         <TableRow>
@@ -112,8 +111,8 @@ export default function CustomizedTables(props) {
                     </TableBody>
                 }
             </Table>
-            <DeleteDialog open={open} setOpen={setOpen} msg={msg} setDialogResult={setDialogResult}/>
-            <AlertDialog open={openAlert} setOpen={setOpenAlert} msg={msgAlert} />
+            <DeleteDialog open={open} setOpen={setOpen} msg={msg} setDialogResult={setDialogResult} />
+            <AlertDialog open={openAlert} setOpen={setOpenAlert} msg={msgAlert} deleted={true} />
         </TableContainer>
     );
 }
